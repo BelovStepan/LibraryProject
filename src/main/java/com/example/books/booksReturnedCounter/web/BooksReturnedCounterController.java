@@ -14,20 +14,25 @@ public class BooksReturnedCounterController {
     private final BooksReturnedCounterRepository booksReturnedCounterRepository;
     private final BooksReturnedCounterService booksReturnedCounterService;
 
-    public BooksReturnedCounterController(BooksReturnedCounterRepository booksReturnedCounterRepository, BooksReturnedCounterService booksReturnedCounterService) {
+    public BooksReturnedCounterController(BooksReturnedCounterRepository booksReturnedCounterRepository,
+                                          BooksReturnedCounterService booksReturnedCounterService) {
         this.booksReturnedCounterRepository = booksReturnedCounterRepository;
         this.booksReturnedCounterService = booksReturnedCounterService;
     }
 
 
-    //GET_ID
+    /*
+    Поиск по id
+     */
     @GetMapping("/{id}")
     @ResponseBody
     public BooksReturnedCounterView getBooksReturnedCounter(@PathVariable Long id) {
         return booksReturnedCounterService.getBooksReturnedCounter(id);
     }
 
-    //CREATE
+    /*
+    Создание записи возврата книги
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
@@ -35,17 +40,20 @@ public class BooksReturnedCounterController {
         return booksReturnedCounterService.create(req);
     }
 
-    //DELETE
+    /*
+    Удаление записи о возврате
+     */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBooksReturnedCounter(@PathVariable Long id){
         booksReturnedCounterService.delete(id);
     }
 
-    //UPDATE
+    /*
+    Обновление записи о возврате
+     */
     @PutMapping("/{id}")
-    public BooksReturnedCounterView updateBooksReturnedCounter(@PathVariable(name = "id") Long id,
-                                             @RequestBody @Valid BooksReturnedCounterBaseReq req){
+    public BooksReturnedCounterView updateBooksReturnedCounter(@PathVariable(name = "id") Long id, @RequestBody @Valid BooksReturnedCounterBaseReq req){
         BooksReturnedCounter booksReturnedCounter = booksReturnedCounterService.findBooksReturnedCounterOrThrow(id);
         return booksReturnedCounterService.update(booksReturnedCounter, req);
     }

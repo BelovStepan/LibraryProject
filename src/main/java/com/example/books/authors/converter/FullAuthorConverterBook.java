@@ -26,6 +26,8 @@ public class FullAuthorConverterBook implements Converter<Authors, AuthorsView> 
         AuthorsView view = new AuthorsView();
         view.setId(authors.getId());
         view.setLastName(authors.getLastName());
+        view.setFirstName(authors.getFirstName());
+        view.setPatronymic(authors.getPatronymic());
         view.setCity(authors.getCity());
         view.setDateOfBirth(authors.getDateOfBirth());
         Set<BooksView> booksViewSet = new HashSet<>();

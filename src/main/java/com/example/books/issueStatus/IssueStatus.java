@@ -1,6 +1,7 @@
 package com.example.books.issueStatus;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 import javax.persistence.*;
 
 @Entity
@@ -13,11 +14,11 @@ public class IssueStatus {
             name = "issue_status_id_seq",
             strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
             parameters = {
-                    @org.hibernate.annotations.Parameter(name = "sequence_name", value = "issue_status_id_seq"),
-                    @org.hibernate.annotations.Parameter(name= "INCREMENT", value = "1"),
-                    @org.hibernate.annotations.Parameter(name = "MINVALUE", value = "1"),
-                    @org.hibernate.annotations.Parameter(name = "MAXVALUE", value = "9223372036854775807"),
-                    @org.hibernate.annotations.Parameter(name = "CACHE", value = "1")
+                    @Parameter(name = "sequence_name", value = "issue_status_id_seq"),
+                    @Parameter(name= "INCREMENT", value = "1"),
+                    @Parameter(name = "MINVALUE", value = "1"),
+                    @Parameter(name = "MAXVALUE", value = "9223372036854775807"),
+                    @Parameter(name = "CACHE", value = "1")
             }
     )
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "issue_status_id_seq")

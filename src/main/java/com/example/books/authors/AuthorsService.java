@@ -30,7 +30,11 @@ public class AuthorsService {
     private final MessageUtil messageUtil;
     private final BooksRepository booksRepository;
 
-    public AuthorsService(AuthorsRepository authorsRepository, AuthorsToAuthorsViewConverter authorsToAuthorsViewConverter, FullAuthorConverterBook fullAuthorConverterBook, MessageUtil messageUtil, BooksRepository booksRepository) {
+    public AuthorsService(AuthorsRepository authorsRepository,
+                          AuthorsToAuthorsViewConverter authorsToAuthorsViewConverter,
+                          FullAuthorConverterBook fullAuthorConverterBook,
+                          MessageUtil messageUtil,
+                          BooksRepository booksRepository) {
         this.authorsRepository = authorsRepository;
         this.authorsToAuthorsViewConverter = authorsToAuthorsViewConverter;
         this.fullAuthorConverterBook = fullAuthorConverterBook;
@@ -38,7 +42,9 @@ public class AuthorsService {
         this.booksRepository = booksRepository;
     }
 
-    //SEARCH_AUTHORS
+    /*
+    Формирование поиск автора по фамилии
+     */
     public Page<AuthorsView> findAuthorsByLastName(String lastName, Pageable pageable){
         Page<Authors> authors  = authorsRepository.findByLastNameLikeIgnoreCase("%"+lastName+"%", pageable);
         List<AuthorsView> authorsViews = new ArrayList<>();
@@ -49,26 +55,72 @@ public class AuthorsService {
         return new PageImpl<>(authorsViews, pageable, authors.getTotalElements());
     }
 
+    /*
+    Формирование поиска автора по имени
+     */
+    public Page<AuthorsView> findAuthorsByFirstName(String firstName, Pageable pageable){
+        Page<Authors> authors  = authorsRepository.findByFirstNameLikeIgnoreCase("%"+firstName+"%", pageable);
+        List<AuthorsView> authorsViews = new ArrayList<>();
+        authors.forEach(author -> {
+            AuthorsView authorsView = fullAuthorConverterBook.convert(author);
+            authorsViews.add(authorsView);
+        });
+        return new PageImpl<>(authorsViews, pageable, authors.getTotalElements());
+    }
 
-    //GET_ID
+    /*
+    Формирование поиска автора по отчеству
+    */
+    public Page<AuthorsView> findAuthorsByPatronymic(String patronymic, Pageable pageable){
+        Page<Authors> authors  = authorsRepository.findByPatronymicLikeIgnoreCase("%"+patronymic+"%", pageable);
+        List<AuthorsView> authorsViews = new ArrayList<>();
+        authors.forEach(author -> {
+            AuthorsView authorsView = fullAuthorConverterBook.convert(author);
+            authorsViews.add(authorsView);
+        });
+        return new PageImpl<>(authorsViews, pageable, authors.getTotalElements());
+    }
+
+    /*
+    Формирование поиска автора по ФИО
+     */
+    public Page<AuthorsView> findByLastNameLikeAndFirstNameLikeAndPatronymic(String lastName, String firstName, String patronymic, Pageable pageable){
+        Page<Authors> authors  = authorsRepository.findByLastNameLikeAndFirstNameLikeAndPatronymicLikeIgnoreCase("%"+lastName+"%", "%"+firstName+"%","%"+patronymic+"%", pageable);
+        List<AuthorsView> authorsViews = new ArrayList<>();
+        authors.forEach(author -> {
+            AuthorsView authorsView = fullAuthorConverterBook.convert(author);
+            authorsViews.add(authorsView);
+        });
+        return new PageImpl<>(authorsViews, pageable, authors.getTotalElements());
+    }
+
+    /*
+    Формирование информации об авторе по id
+    */
     public AuthorsView getAuthor(Long id) {
         Authors authors = findAuthorsOrThrow(id);
         return authorsToAuthorsViewConverter.convert(authors);
     }
 
-    //GET_ID_Full
+    /*
+    формирование информации об авторе вместе с книгами по id
+    */
     public AuthorsView getAuthorFull(Long id) {
         Authors authors = findAuthorsOrThrow(id);
         return fullAuthorConverterBook.convert(authors);
     }
 
-    //Search_GET_ID
+    /*
+    Поиск id
+     */
     public Authors findAuthorsOrThrow(Long id) {
         return authorsRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(messageUtil.getMessage("author.NotFound", id)));
     }
 
-    //GET_ALL
+    /*
+    Формирование информации об авторе без книг
+     */
     public Page<AuthorsView> findAllAuthors(Pageable pageable){
         Page<Authors> authors = authorsRepository.findAll(pageable);
         List<AuthorsView> authorsViews = new ArrayList<>();
@@ -79,7 +131,9 @@ public class AuthorsService {
         return new PageImpl<>(authorsViews, pageable, authors.getTotalElements());
     }
 
-    //FULL_GET_ALL
+    /*
+    Формирование информации об авторе с книгами
+     */
     public Page<AuthorsView> findAllAuthorsFull(Pageable pageable){
         Page<Authors> authors = authorsRepository.findAll(pageable);
         List<AuthorsView> authorsViews = new ArrayList<>();
@@ -91,7 +145,9 @@ public class AuthorsService {
     }
 
 
-    //CREATE
+    /*
+    Создание записи об авторе
+     */
     public AuthorsView create(AuthorsBaseReq req) {
         Authors authors = new Authors();
         this.prepare(authors, req);
@@ -99,8 +155,10 @@ public class AuthorsService {
         return fullAuthorConverterBook.convert(authorSave);
     }
 
+    /*
+    Поиск по id
+     */
     @Transactional
-    //DELETE
     public void delete(Long id) {
         try {
             authorsRepository.deleteById(id);
@@ -109,15 +167,22 @@ public class AuthorsService {
         }
     }
 
-    //UPDATE
+    /*
+    Обновление записи об авторе
+     */
     public AuthorsView update(Authors authors, AuthorsBaseReq req) {
         Authors newAuthor = this.prepare(authors,req);
         Authors authorSave = authorsRepository.save(newAuthor);
         return authorsToAuthorsViewConverter.convert(authorSave);
     }
 
+    /*
+    Преобразование данных
+     */
     private Authors prepare(Authors authors, AuthorsBaseReq authorsBaseReq){
             authors.setLastName(authorsBaseReq.getLastName());
+            authors.setFirstName(authorsBaseReq.getFirstName());
+            authors.setPatronymic(authorsBaseReq.getPatronymic());
             authors.setCity(authorsBaseReq.getCity());
             authors.setDateOfBirth(authorsBaseReq.getDateOfBirth());
          List<Books> booksList = booksRepository.findAllById(authorsBaseReq.getBooks()

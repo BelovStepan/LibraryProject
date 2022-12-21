@@ -15,19 +15,24 @@ public class IssueStatusController {
     private final IssueStatusRepository issueStatusRepository;
     private final IssueStatusService issueStatusService;
 
-    public IssueStatusController(IssueStatusRepository issueStatusRepository, IssueStatusService issueStatusService) {
+    public IssueStatusController(IssueStatusRepository issueStatusRepository,
+                                 IssueStatusService issueStatusService) {
         this.issueStatusRepository = issueStatusRepository;
         this.issueStatusService = issueStatusService;
     }
 
-    //GET_ID
+    /*
+    Поиск статуса выдачи по id
+     */
     @GetMapping("/{id}")
     @ResponseBody
     public IssueStatusView getIssueStatus(@PathVariable Long id) {
         return issueStatusService.getIssueStatus(id);
     }
 
-    //CREATE
+    /*
+    Создание статуса выдачи
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
@@ -35,14 +40,18 @@ public class IssueStatusController {
         return issueStatusService.create(req);
     }
 
-    //DELETE
+    /*
+    Удаление статуса выдачи по id
+     */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteIssueStatus(@PathVariable Long id){
         issueStatusService.delete(id);
     }
 
-    //UPDATE
+    /*
+    Обновление статуса выдачи по id
+     */
     @PutMapping("/{id}")
     public IssueStatusView updateIssueStatus(@PathVariable(name = "id") Long id,
                                     @RequestBody @Valid IssueStatusBaseReq req){

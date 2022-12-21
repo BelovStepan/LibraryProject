@@ -8,6 +8,8 @@ CREATE SEQUENCE authors_id_seq
 CREATE TABLE authors (
     id int8 NOT NULL DEFAULT nextval('authors_id_seq'),
     last_name VARCHAR(255) NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    patronymic VARCHAR(255) NULL,
     city VARCHAR(255) NOT NULL,
     date_of_birth TIMESTAMP NOT NULL,
     primary key (id));
@@ -70,6 +72,8 @@ CREATE SEQUENCE readers_id_seq
 CREATE TABLE readers (
     id int8 NOT NULL DEFAULT nextval('readers_id_seq'),
     last_name VARCHAR(255) NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    patronymic VARCHAR(255) NULL,
     phone_number VARCHAR(255) NOT NULL,
     passport_data VARCHAR(255) NOT NULL,
     date_of_birth TIMESTAMP NOT NULL,

@@ -23,8 +23,11 @@ public class LoanOfBooksService {
     private final MessageUtil messageUtil;
 
     public LoanOfBooksService(LoanOfBooksRepository loanOfBooksRepository,
-                              LoanOfBooksToLoanOfBooksViewConverter loanOfBooksToLoanOfBooksViewConverter, BooksRepository booksRepository, ReadersRepository readersRepository,
-                              IssueStatusRepository issueStatusRepository, MessageUtil messageUtil) {
+                              LoanOfBooksToLoanOfBooksViewConverter loanOfBooksToLoanOfBooksViewConverter,
+                              BooksRepository booksRepository,
+                              ReadersRepository readersRepository,
+                              IssueStatusRepository issueStatusRepository,
+                              MessageUtil messageUtil) {
         this.loanOfBooksRepository = loanOfBooksRepository;
         this.loanOfBooksToLoanOfBooksViewConverter = loanOfBooksToLoanOfBooksViewConverter;
         this.booksRepository = booksRepository;
@@ -34,20 +37,26 @@ public class LoanOfBooksService {
     }
 
 
-    //GET_ID
+    /*
+    Поиск записи выдачи книги по id
+     */
     public LoanOfBooksView getLoanOfBooks(Long id) {
         LoanOfBooks loanOfBooks = findLoanOfBooksOrThrow(id);
         return loanOfBooksToLoanOfBooksViewConverter.convert(loanOfBooks);
     }
 
-    //Search_GET_ID
+    /*
+    Поиск по id
+     */
     public LoanOfBooks findLoanOfBooksOrThrow(Long id) {
         return loanOfBooksRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(messageUtil.getMessage("loanOfBooks.NotFound", id)));
     }
 
 
-    //CREATE
+    /*
+    Создание записи выдачи книги
+     */
     public LoanOfBooksView create(LoanOfBooksBaseReq req) {
         LoanOfBooks loanOfBooks = new LoanOfBooks();
         this.prepare(loanOfBooks, req);
@@ -55,8 +64,10 @@ public class LoanOfBooksService {
         return loanOfBooksToLoanOfBooksViewConverter.convert(LoanOfBooksSave);
     }
 
+    /*
+    Удаление записи выдачи книги
+     */
     @Transactional
-    //DELETE
     public void delete(Long id) {
         try {
             loanOfBooksRepository.deleteById(id);
@@ -65,14 +76,18 @@ public class LoanOfBooksService {
         }
     }
 
-    //UPDATE
+    /*
+    Обновление записи выдачи книги
+     */
     public LoanOfBooksView update(LoanOfBooks loanOfBooks, LoanOfBooksBaseReq req) {
         LoanOfBooks newLoanOfBooks = this.prepare(loanOfBooks,req);
         LoanOfBooks loanOfBookSave = loanOfBooksRepository.save(newLoanOfBooks);
         return loanOfBooksToLoanOfBooksViewConverter.convert(loanOfBookSave);
     }
 
-    //PREPARE
+    /*
+    Преобразование данных
+     */
     private LoanOfBooks prepare(LoanOfBooks loanOfBooks, LoanOfBooksBaseReq loanOfBooksBaseReq){
         loanOfBooks.setDateOfIssue(loanOfBooksBaseReq.getDateOfIssue());
         loanOfBooks.setIssuancePeriod(loanOfBooksBaseReq.getIssuancePeriod());

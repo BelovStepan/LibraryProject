@@ -21,8 +21,10 @@ public class ReturnOfBooksService {
     private final MessageUtil messageUtil;
 
     public ReturnOfBooksService(ReturnOfBooksRepository returnOfBooksRepository,
-                                ReturnOfBooksToReturnOfBooksViewConverter returnOfBooksToReturnOfBooksViewConverter, ReadersRepository readersRepository,
-                                LoanOfBooksRepository loanOfBooksRepository, MessageUtil messageUtil) {
+                                ReturnOfBooksToReturnOfBooksViewConverter returnOfBooksToReturnOfBooksViewConverter,
+                                ReadersRepository readersRepository,
+                                LoanOfBooksRepository loanOfBooksRepository,
+                                MessageUtil messageUtil) {
         this.returnOfBooksRepository = returnOfBooksRepository;
         this.returnOfBooksToReturnOfBooksViewConverter = returnOfBooksToReturnOfBooksViewConverter;
         this.readersRepository = readersRepository;
@@ -31,20 +33,26 @@ public class ReturnOfBooksService {
     }
 
 
-    //GET_ID
+    /*
+    Формирование вывода возвратов по id
+     */
     public ReturnOfBooksView getReturnOfBooks(Long id) {
         ReturnOfBooks returnOfBooks = findReturnOfBooksOrThrow(id);
         return returnOfBooksToReturnOfBooksViewConverter.convert(returnOfBooks);
     }
 
-    //Search_GET_ID
+    /*
+    Поиск по id
+     */
     public ReturnOfBooks findReturnOfBooksOrThrow(Long id) {
         return returnOfBooksRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(messageUtil.getMessage("returnOfBooks.NotFound", id)));
     }
 
 
-    //CREATE
+    /*
+    Создание возврата
+     */
     public ReturnOfBooksView create(ReturnOfBooksBaseReq req) {
         ReturnOfBooks returnOfBooks = new ReturnOfBooks();
         this.prepare(returnOfBooks, req);
@@ -52,8 +60,10 @@ public class ReturnOfBooksService {
         return returnOfBooksToReturnOfBooksViewConverter.convert(returnOfBooksSave);
     }
 
+    /*
+    Удаление возврата
+     */
     @Transactional
-    //DELETE
     public void delete(Long id) {
         try {
             returnOfBooksRepository.deleteById(id);
@@ -62,14 +72,18 @@ public class ReturnOfBooksService {
         }
     }
 
-    //UPDATE
+    /*
+    Обновление записи возврата
+     */
     public ReturnOfBooksView update(ReturnOfBooks returnOfBooks, ReturnOfBooksBaseReq req) {
         ReturnOfBooks newReturnOfBooks = this.prepare(returnOfBooks,req);
         ReturnOfBooks returnOfBooksSave = returnOfBooksRepository.save(newReturnOfBooks);
         return returnOfBooksToReturnOfBooksViewConverter.convert(returnOfBooksSave);
     }
 
-    //PREPARE
+    /*
+    Преобразование данных
+     */
     private ReturnOfBooks prepare(ReturnOfBooks returnOfBooks, ReturnOfBooksBaseReq returnOfBooksBaseReq){
         returnOfBooks.setReturnAmount(returnOfBooksBaseReq.getReturnAmount());
         returnOfBooks.setReaders(readersRepository.getOne(returnOfBooksBaseReq.getReadersId()));

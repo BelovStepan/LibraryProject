@@ -15,6 +15,8 @@ public class AuthorsToAuthorsViewConverter implements Converter<Authors, Authors
         AuthorsView view = new AuthorsView();
         view.setId(authors.getId());
         view.setLastName(authors.getLastName());
+        view.setFirstName(authors.getFirstName());
+        view.setPatronymic(authors.getPatronymic());
         view.setCity(authors.getCity());
         view.setDateOfBirth(authors.getDateOfBirth());
         return view;

@@ -14,20 +14,25 @@ public class ReturnOfBooksController {
     private final ReturnOfBooksRepository returnOfBooksRepository;
     private final ReturnOfBooksService returnOfBooksService;
 
-    public ReturnOfBooksController(ReturnOfBooksRepository returnOfBooksRepository, ReturnOfBooksService returnOfBooksService) {
+    public ReturnOfBooksController(ReturnOfBooksRepository returnOfBooksRepository,
+                                   ReturnOfBooksService returnOfBooksService) {
         this.returnOfBooksRepository = returnOfBooksRepository;
         this.returnOfBooksService = returnOfBooksService;
     }
 
 
-    //GET_ID
+    /*
+    Поиск возвратов по id
+     */
     @GetMapping("/{id}")
     @ResponseBody
     public ReturnOfBooksView getReturnOfBooks(@PathVariable Long id) {
         return returnOfBooksService.getReturnOfBooks(id);
     }
 
-    //CREATE
+    /*
+    Создание нового возврата
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
@@ -35,14 +40,18 @@ public class ReturnOfBooksController {
         return returnOfBooksService.create(req);
     }
 
-    //DELETE
+    /*
+    Удаление возврата
+     */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReturnOfBooks(@PathVariable Long id){
         returnOfBooksService.delete(id);
     }
 
-    //UPDATE
+    /*
+    Обновление записи о возврате по id
+     */
     @PutMapping("/{id}")
     public ReturnOfBooksView updateReturnOfBooks(@PathVariable(name = "id") Long id,
                                              @RequestBody @Valid ReturnOfBooksBaseReq req){

@@ -25,6 +25,8 @@ public class ReadersToReadersViewConverterWithAdditionReturnOfBooks implements C
         view.setId(readers.getId());
         view.setPhoneNumber(readers.getPhoneNumber());
         view.setLastName(readers.getLastName());
+        view.setFirstName(readers.getFirstName());
+        view.setPatronymic(readers.getPatronymic());
         view.setPassportData(readers.getPassportData());
         view.setDateOfBirth(readers.getDateOfBirth());
 

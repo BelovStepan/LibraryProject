@@ -22,7 +22,12 @@ public class BooksReturnedCounterService {
     private final LoanOfBooksRepository loanOfBooksRepository;
     private final MessageUtil messageUtil;
 
-    public BooksReturnedCounterService(BooksReturnedCounterRepository booksReturnedCounterRepository, BooksReturnedCounterToBooksReturnedCounterViewConverter booksReturnedCounterToBooksReturnedCounterViewConverter, ReturnOfBooksRepository returnOfBooksRepository, IssueStatusRepository issueStatusRepository, LoanOfBooksRepository loanOfBooksRepository, MessageUtil messageUtil) {
+    public BooksReturnedCounterService(BooksReturnedCounterRepository booksReturnedCounterRepository,
+                                       BooksReturnedCounterToBooksReturnedCounterViewConverter booksReturnedCounterToBooksReturnedCounterViewConverter,
+                                       ReturnOfBooksRepository returnOfBooksRepository,
+                                       IssueStatusRepository issueStatusRepository,
+                                       LoanOfBooksRepository loanOfBooksRepository,
+                                       MessageUtil messageUtil) {
         this.booksReturnedCounterRepository = booksReturnedCounterRepository;
         this.booksReturnedCounterToBooksReturnedCounterViewConverter = booksReturnedCounterToBooksReturnedCounterViewConverter;
         this.returnOfBooksRepository = returnOfBooksRepository;
@@ -31,20 +36,26 @@ public class BooksReturnedCounterService {
         this.messageUtil = messageUtil;
     }
 
-    //GET_ID
+    /*
+    Формирование вывода о возврате по id
+     */
     public BooksReturnedCounterView getBooksReturnedCounter(Long id) {
         BooksReturnedCounter booksReturnedCounter = findBooksReturnedCounterOrThrow(id);
         return booksReturnedCounterToBooksReturnedCounterViewConverter.convert(booksReturnedCounter);
     }
 
-    //Search_GET_ID
+    /*
+    Поиск id
+     */
     public BooksReturnedCounter findBooksReturnedCounterOrThrow(Long id) {
         return booksReturnedCounterRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(messageUtil.getMessage("booksReturnedCounter.NotFound", id)));
     }
 
 
-    //CREATE
+    /*
+    Формирование создания возврата
+     */
     public BooksReturnedCounterView create(BooksReturnedCounterBaseReq req) {
         BooksReturnedCounter booksReturnedCounter = new BooksReturnedCounter();
         this.prepare(booksReturnedCounter, req);
@@ -52,8 +63,10 @@ public class BooksReturnedCounterService {
         return booksReturnedCounterToBooksReturnedCounterViewConverter.convert(booksReturnedCounterSave);
     }
 
+    /*
+    Формирование удаления возврата
+     */
     @Transactional
-    //DELETE
     public void delete(Long id) {
         try {
             booksReturnedCounterRepository.deleteById(id);
@@ -62,14 +75,18 @@ public class BooksReturnedCounterService {
         }
     }
 
-    //UPDATE
+    /*
+    Формирование обновления возврата
+     */
     public BooksReturnedCounterView update(BooksReturnedCounter booksReturnedCounter, BooksReturnedCounterBaseReq req) {
         BooksReturnedCounter newBooksReturnedCounter = this.prepare(booksReturnedCounter,req);
         BooksReturnedCounter booksReturnedCounterSave = booksReturnedCounterRepository.save(newBooksReturnedCounter);
         return booksReturnedCounterToBooksReturnedCounterViewConverter.convert(booksReturnedCounterSave);
     }
 
-    //PREPARE
+    /*
+    Преобразование данных
+     */
     private BooksReturnedCounter prepare(BooksReturnedCounter booksReturnedCounter, BooksReturnedCounterBaseReq booksReturnedCounterReq){
         booksReturnedCounter.setQuantityReturned(booksReturnedCounterReq.getQuantityReturned());
         booksReturnedCounter.setIssueStatus(issueStatusRepository.getOne(booksReturnedCounterReq.getIssueStatusId()));

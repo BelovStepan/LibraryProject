@@ -16,26 +16,34 @@ public class IssueStatusService {
     private final IssueStatusToIssueStatusViewConverter issueStatusToIssueStatusViewConverter;
     private final MessageUtil messageUtil;
 
-    public IssueStatusService(IssueStatusRepository issueStatusRepository, IssueStatusToIssueStatusViewConverter issueStatusToIssueStatusViewConverter, MessageUtil messageUtil) {
+    public IssueStatusService(IssueStatusRepository issueStatusRepository,
+                              IssueStatusToIssueStatusViewConverter issueStatusToIssueStatusViewConverter,
+                              MessageUtil messageUtil) {
         this.issueStatusRepository = issueStatusRepository;
         this.issueStatusToIssueStatusViewConverter = issueStatusToIssueStatusViewConverter;
         this.messageUtil = messageUtil;
     }
 
 
-    //GET_ID
+    /*
+    Формирование вывода статуса выдачи по id
+     */
     public IssueStatusView getIssueStatus(Long id) {
         IssueStatus issueStatus = findIssueStatusOrThrow(id);
         return issueStatusToIssueStatusViewConverter.convert(issueStatus);
     }
 
-    //Search_GET_ID
+    /*
+    Поиск id
+     */
     public IssueStatus findIssueStatusOrThrow(Long id) {
         return issueStatusRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(messageUtil.getMessage("issueStatus.NotFound", id)));
     }
 
-    //CREATE
+    /*
+    Формирование создания статуса выдачи
+     */
     public IssueStatusView create(IssueStatusBaseReq req) {
         IssueStatus issueStatus = new IssueStatus();
         this.prepare(issueStatus, req);
@@ -43,8 +51,10 @@ public class IssueStatusService {
         return issueStatusToIssueStatusViewConverter.convert(issueStatusSave);
     }
 
+    /*
+    Формирование удаления статуса выдачи
+     */
     @Transactional
-    //DELETE
     public void delete(Long id) {
         try {
             issueStatusRepository.deleteById(id);
@@ -53,14 +63,18 @@ public class IssueStatusService {
         }
     }
 
-    //UPDATE
+    /*
+    Формирование обновления статуса выдачи
+     */
     public IssueStatusView update(IssueStatus issueStatus, IssueStatusBaseReq req) {
         IssueStatus newIssueStatus = this.prepare(issueStatus,req);
         IssueStatus issueStatusSave = issueStatusRepository.save(newIssueStatus);
         return issueStatusToIssueStatusViewConverter.convert(issueStatusSave);
     }
 
-    //PREPARE
+    /*
+    Преобразование данных
+     */
     private IssueStatus prepare(IssueStatus issueStatus, IssueStatusBaseReq issueStatusBaseReq){
         issueStatus.setStatusName(issueStatusBaseReq.getStatusName());
         return issueStatus;

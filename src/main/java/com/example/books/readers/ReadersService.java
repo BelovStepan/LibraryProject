@@ -27,7 +27,11 @@ public class ReadersService {
     private final ReadersToReadersViewConverterWithAdditionLoanOfBooks readersToReadersViewConverterLoanOfBooks;
     private final MessageUtil messageUtil;
 
-    public ReadersService(ReadersRepository readersRepository, ReadersToReadersViewConverter readersToReadersViewConverter, ReadersToReadersViewConverterWithAdditionReturnOfBooks readersToReadersViewConverterReturnOfBooks, ReadersToReadersViewConverterWithAdditionLoanOfBooks readersToReadersViewConverterLoanOfBooks, MessageUtil messageUtil) {
+    public ReadersService(ReadersRepository readersRepository,
+                          ReadersToReadersViewConverter readersToReadersViewConverter,
+                          ReadersToReadersViewConverterWithAdditionReturnOfBooks readersToReadersViewConverterReturnOfBooks,
+                          ReadersToReadersViewConverterWithAdditionLoanOfBooks readersToReadersViewConverterLoanOfBooks,
+                          MessageUtil messageUtil) {
         this.readersRepository = readersRepository;
         this.readersToReadersViewConverter = readersToReadersViewConverter;
         this.readersToReadersViewConverterReturnOfBooks = readersToReadersViewConverterReturnOfBooks;
@@ -35,7 +39,9 @@ public class ReadersService {
         this.messageUtil = messageUtil;
     }
 
-    //SEARCH_READERS_LAST_NAME
+   /*
+   Формирование вывода о читателе по фамилии
+    */
     public Page<ReadersViewNotLoanOfBooksAndReturnOfBooks> findReadersByLastName(String lastName, Pageable pageable){
         Page<Readers> readers  = readersRepository.findByLastNameLikeIgnoreCase("%"+lastName+"%", pageable);
         List<ReadersViewNotLoanOfBooksAndReturnOfBooks> readersViews = new ArrayList<>();
@@ -46,7 +52,50 @@ public class ReadersService {
         return new PageImpl<>(readersViews, pageable, readers.getTotalElements());
     }
 
-    //GET_ALL_ALPHABETICALLY
+    /*
+    Формирование вывода о читателе по имени
+     */
+    public Page<ReadersViewNotLoanOfBooksAndReturnOfBooks> findReadersByFirstName(String firstName, Pageable pageable){
+        Page<Readers> readers  = readersRepository.findByFirstNameLikeIgnoreCase("%"+firstName+"%", pageable);
+        List<ReadersViewNotLoanOfBooksAndReturnOfBooks> readersViews = new ArrayList<>();
+        readers.forEach(reader -> {
+            ReadersViewNotLoanOfBooksAndReturnOfBooks readersView = readersToReadersViewConverter.convert(reader);
+            readersViews.add(readersView);
+        });
+        return new PageImpl<>(readersViews, pageable, readers.getTotalElements());
+    }
+
+    /*
+    Формирование вывода о читателе по отчеству
+     */
+    public Page<ReadersViewNotLoanOfBooksAndReturnOfBooks> findReadersByPatronymic(String patronymic, Pageable pageable){
+        Page<Readers> readers  = readersRepository.findByPatronymicLikeIgnoreCase("%"+patronymic+"%", pageable);
+        List<ReadersViewNotLoanOfBooksAndReturnOfBooks> readersViews = new ArrayList<>();
+        readers.forEach(reader -> {
+            ReadersViewNotLoanOfBooksAndReturnOfBooks readersView = readersToReadersViewConverter.convert(reader);
+            readersViews.add(readersView);
+        });
+        return new PageImpl<>(readersViews, pageable, readers.getTotalElements());
+    }
+
+    /*
+    Формирование вывода по фамилии, имени, отчеству
+    Используется LIKE для частичного ввода информации
+    Регистр не учитывается
+     */
+    public Page<ReadersViewNotLoanOfBooksAndReturnOfBooks> findReadersByLastNameAndFirstNameAndPatronymic(String lastName, String firstName, String patronymic,  Pageable pageable){
+        Page<Readers> readers  = readersRepository.findByLastNameLikeAndFirstNameLikeAndPatronymicLikeIgnoreCase("%"+lastName+"%", "%"+firstName+"%","%"+patronymic+"%", pageable);
+        List<ReadersViewNotLoanOfBooksAndReturnOfBooks> readersViews = new ArrayList<>();
+        readers.forEach(reader -> {
+            ReadersViewNotLoanOfBooksAndReturnOfBooks readersView = readersToReadersViewConverter.convert(reader);
+            readersViews.add(readersView);
+        });
+        return new PageImpl<>(readersViews, pageable, readers.getTotalElements());
+    }
+
+    /*
+    Формирование вывода всех читателей
+     */
     public Page<ReadersViewNotLoanOfBooksAndReturnOfBooks> findAllReaders(Pageable pageable){
         Page<Readers> readers = readersRepository.findAll(pageable);
         List<ReadersViewNotLoanOfBooksAndReturnOfBooks> readersViewNotLoanOfBooksAndReturnOfBooks = new ArrayList<>();
@@ -57,27 +106,41 @@ public class ReadersService {
         return new PageImpl<>(readersViewNotLoanOfBooksAndReturnOfBooks, pageable, readers.getTotalElements());
     }
 
+    /*
+    Формирование вывода читателя по id
+     */
     public ReadersViewNotLoanOfBooksAndReturnOfBooks getReaders(Long id) {
         Readers readers = findReadersOrThrow(id);
         return readersToReadersViewConverter.convert(readers);
     }
 
+    /*
+    Формирование вывода читателя с возвратами по id
+     */
     public ReadersView getReturnReaders(Long id) {
         Readers readers = findReadersOrThrow(id);
         return readersToReadersViewConverterReturnOfBooks.convert(readers);
     }
 
+    /*
+    Формирование вывода читателя с выдачами по id
+     */
     public ReadersView getLoanOfBooksReaders(Long id) {
         Readers readers = findReadersOrThrow(id);
         return readersToReadersViewConverterLoanOfBooks.convert(readers);
     }
 
+    /*
+    Поиск id
+     */
     public Readers findReadersOrThrow(Long id) {
         return readersRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(messageUtil.getMessage("readers.NotFound", id)));
     }
 
-    //CREATE
+    /*
+    Создание записи о читателе
+     */
     public ReadersViewNotLoanOfBooksAndReturnOfBooks create(ReadersBaseReq req) {
         Readers readers = new Readers();
         this.prepare(readers, req);
@@ -85,8 +148,10 @@ public class ReadersService {
         return readersToReadersViewConverter.convert(readersSave);
     }
 
+    /*
+    Удаление записи о читателе
+     */
     @Transactional
-    //DELETE
     public void delete(Long id) {
         try {
             readersRepository.deleteById(id);
@@ -95,16 +160,22 @@ public class ReadersService {
         }
     }
 
-    //UPDATE
+    /*
+    Обновление записи о читателе
+     */
     public ReadersViewNotLoanOfBooksAndReturnOfBooks update(Readers readers, ReadersBaseReq req) {
         Readers newReaders = this.prepare(readers,req);
         Readers readersSave = readersRepository.save(newReaders);
         return readersToReadersViewConverter.convert(readersSave);
     }
 
-    //PREPARE
+    /*
+    Преобразование данных
+     */
     private Readers prepare(Readers readers, ReadersBaseReq readersBaseReq){
         readers.setLastName(readersBaseReq.getLastName());
+        readers.setFirstName(readersBaseReq.getFirstName());
+        readers.setPatronymic(readersBaseReq.getPatronymic());
         readers.setPhoneNumber(readersBaseReq.getPhoneNumber());
         readers.setPassportData(readersBaseReq.getPassportData());
         readers.setDateOfBirth(readersBaseReq.getDateOfBirth());

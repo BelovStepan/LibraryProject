@@ -28,7 +28,11 @@ public class BooksService {
     private final MessageUtil messageUtil;
     private final FullBookConverterAuthor fullBookConverterAuthor;
 
-    public BooksService(BooksRepository booksRepository, AuthorsRepository authorsRepository, BookToBookViewConverter bookToBookViewConverter, MessageUtil messageUtil, FullBookConverterAuthor fullBookConverterAuthor) {
+    public BooksService(BooksRepository booksRepository,
+                        AuthorsRepository authorsRepository,
+                        BookToBookViewConverter bookToBookViewConverter,
+                        MessageUtil messageUtil,
+                        FullBookConverterAuthor fullBookConverterAuthor) {
         this.booksRepository = booksRepository;
         this.authorsRepository = authorsRepository;
         this.bookToBookViewConverter = bookToBookViewConverter;
@@ -36,7 +40,9 @@ public class BooksService {
         this.fullBookConverterAuthor = fullBookConverterAuthor;
     }
 
-    //SEARCH_NAME_BOOK
+    /*
+    Формирование вывода по наименованию книги
+     */
     public Page<BooksView> findBooksByNameBook(String nameBook, Pageable pageable){
         Page<Books> books  = booksRepository.findByNameBookLikeIgnoreCase("%"+nameBook+"%", pageable);
         List<BooksView> booksViews = new ArrayList<>();
@@ -47,30 +53,25 @@ public class BooksService {
         return new PageImpl<>(booksViews, pageable, books.getTotalElements());
     }
 
-    //GET_ID
+    /*
+    Формирование вывода книги по id
+     */
     public BooksView getById(Long id) {
         Books books = findBooksOrThrow(id);
         return bookToBookViewConverter.convert(books);
     }
 
-    //Search_GET_ID
+    /*
+    Поиск по id
+     */
     public Books findBooksOrThrow(Long id) {
         return booksRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(messageUtil.getMessage("book.NotFound", id)));
     }
 
-    //GET_ALL_HEADER
-    public Page<BooksView> findAllBooksHeader(Pageable pageable){
-        Page<Books> books = booksRepository.findAll(pageable);
-        List<BooksView> booksViews = new ArrayList<>();
-        books.forEach(book -> {
-            BooksView booksView = bookToBookViewConverter.convert(book);
-            booksViews.add(booksView);
-        });
-        return new PageImpl<>(booksViews, pageable, books.getTotalElements());
-    }
-
-    //GET_ALL
+    /*
+    Формирование вывода всех книг без авторов
+     */
     public Page<BooksView> findAllBooks(Pageable pageable){
         Page<Books> books = booksRepository.findAll(pageable);
         List<BooksView> booksViews = new ArrayList<>();
@@ -81,7 +82,9 @@ public class BooksService {
         return new PageImpl<>(booksViews, pageable, books.getTotalElements());
     }
 
-    //FULL_GET_ALL
+    /*
+    Формирование вывода книг вместе с авторами
+     */
     public Page<BooksView> findAllBooksFull(Pageable pageable){
         Page<Books> books = booksRepository.findAll(pageable);
         List<BooksView> booksViews = new ArrayList<>();
@@ -92,13 +95,17 @@ public class BooksService {
         return new PageImpl<>(booksViews, pageable, books.getTotalElements());
     }
 
-    //FULL_GET_ALL_ID
+    /*
+    Формирование вывода книг вместе с авторами по id
+     */
     public BooksView getByIdFull(Long id) {
         Books books = findBooksOrThrow(id);
         return fullBookConverterAuthor.convert(books);
     }
 
-    //CREATE
+    /*
+    Создание новой записи о книге
+     */
     public BooksView create(BooksBaseReq req) {
         Books books = new Books();
         this.prepare(books, req);
@@ -106,8 +113,10 @@ public class BooksService {
         return fullBookConverterAuthor.convert(bookSave);
     }
 
+    /*
+    Удаление записи о книге
+     */
     @Transactional
-    //DELETE
     public void delete(Long id) {
         try {
             booksRepository.deleteById(id);
@@ -116,13 +125,18 @@ public class BooksService {
         }
     }
 
-    //UPDATE
+    /*
+    Обновление записи о книге
+     */
     public BooksView update(Books book, BooksBaseReq req) {
         Books newBook = this.prepare(book,req);
         Books bookSave = booksRepository.save(newBook);
         return bookToBookViewConverter.convert(bookSave);
     }
 
+    /*
+    Преобразование данных
+     */
     private Books prepare(Books books, BooksBaseReq booksBaseReq){
         books.setNameBook(booksBaseReq.getNameBook());
         books.setYearPublishing(booksBaseReq.getYearPublishing());

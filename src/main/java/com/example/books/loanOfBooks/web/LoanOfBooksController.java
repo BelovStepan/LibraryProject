@@ -20,7 +20,11 @@ public class LoanOfBooksController {
     private final ReadersRepository readersRepository;
     private final IssueStatusRepository issueStatusRepository;
 
-    public LoanOfBooksController(LoanOfBooksRepository loanOfBooksRepository, LoanOfBooksService loanOfBooksService, BooksRepository booksRepository, ReadersRepository readersRepository, IssueStatusRepository issueStatusRepository) {
+    public LoanOfBooksController(LoanOfBooksRepository loanOfBooksRepository,
+                                 LoanOfBooksService loanOfBooksService,
+                                 BooksRepository booksRepository,
+                                 ReadersRepository readersRepository,
+                                 IssueStatusRepository issueStatusRepository) {
         this.loanOfBooksRepository = loanOfBooksRepository;
         this.loanOfBooksService = loanOfBooksService;
         this.booksRepository = booksRepository;
@@ -29,14 +33,18 @@ public class LoanOfBooksController {
     }
 
 
-    //GET_ID
+    /*
+    Поиск выдачи книги по id
+     */
     @GetMapping("/{id}")
     @ResponseBody
     public LoanOfBooksView getLoanOfBooks(@PathVariable Long id) {
         return loanOfBooksService.getLoanOfBooks(id);
     }
 
-    //CREATE
+    /*
+    Создание выдачи книги
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
@@ -44,14 +52,18 @@ public class LoanOfBooksController {
         return loanOfBooksService.create(req);
     }
 
-    //DELETE
+    /*
+    Удаление записи выдачи книги
+     */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteLoanOfBooks(@PathVariable Long id){
         loanOfBooksService.delete(id);
     }
 
-    //UPDATE
+    /*
+    Обновление записи выдачи книги
+     */
     @PutMapping("/{id}")
     public LoanOfBooksView updateLoanOfBooks(@PathVariable(name = "id") Long id,
                                              @RequestBody @Valid LoanOfBooksBaseReq req){

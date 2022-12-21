@@ -20,47 +20,91 @@ public class AuthorsController {
     private final AuthorsService authorsService;
     private final AuthorsRepository authorsRepository;
 
-    public AuthorsController(AuthorsService authorsService, AuthorsRepository authorsRepository) {
+    public AuthorsController(AuthorsService authorsService,
+                             AuthorsRepository authorsRepository) {
         this.authorsService = authorsService;
         this.authorsRepository = authorsRepository;
     }
 
-    //GET_BY_LAST_NAME
-    @GetMapping("/")
+    /*
+    Поиск автора по фамилии
+     */
+    @GetMapping("/get_author_by_lastName")
     @ResponseBody
     public Page<AuthorsView> getAuthorsByLastName(@RequestParam(required = false) String lastName, @PageableDefault(size = 5, page = 0) Pageable pageable) {
             return authorsService.findAuthorsByLastName(lastName, pageable);
         }
 
-    //GET_ID
+    /*
+    Поиск автора по имени
+     */
+    @GetMapping("/get_author_by_firstName")
+    @ResponseBody
+    public Page<AuthorsView> getAuthorsByFirstName(@RequestParam(required = false) String firstName, @PageableDefault(size = 5, page = 0) Pageable pageable) {
+        return authorsService.findAuthorsByFirstName(firstName, pageable);
+    }
+
+    /*
+    Поиск автора по отчеству
+     */
+    @GetMapping("/get_author_by_patronymic")
+    @ResponseBody
+    public Page<AuthorsView> getAuthorsByPatronymic(@RequestParam(required = false) String patronymic, @PageableDefault(size = 5, page = 0) Pageable pageable) {
+        return authorsService.findAuthorsByPatronymic(patronymic, pageable);
+    }
+
+    /*
+    Поиск автора по ФИО
+     */
+    @GetMapping("/get_author_full")
+    @ResponseBody
+    public Page<AuthorsView> getByLastNameLikeAndFirstNameLikeAndPatronymic(@RequestParam(required = false)
+                                                                                          String lastName,
+                                                                                          String firstName,
+                                                                                          String patronymic,
+                                                                                          @PageableDefault(size = 5, page = 0) Pageable pageable) {
+        return authorsService.findByLastNameLikeAndFirstNameLikeAndPatronymic(lastName, firstName, patronymic, pageable);
+    }
+
+    /*
+    Поиск по id
+     */
     @GetMapping("/{id}")
     @ResponseBody
     public AuthorsView getAuthor(@PathVariable Long id) {
         return authorsService.getAuthor(id);
     }
 
-    //GET_ALL
+    /*
+    Вывод всех авторов с сортировкой по фамилии
+     */
     @GetMapping
     @ResponseBody
     public Page<AuthorsView> getAllAuthors(@PageableDefault(sort = "lastName", direction = Sort.Direction.ASC) Pageable pageable) {
         return authorsService.findAllAuthors(pageable);
     }
 
-    //FULL_GET_ALL
+    /*
+    Вывод информации о авторе вместе с его книгами
+     */
     @GetMapping("/full_information_author")
     @ResponseBody
     public Page<AuthorsView> findAllAuthorsFull(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         return authorsService.findAllAuthorsFull(pageable);
     }
 
-    //FULL_GET_ALL_ID
+    /*
+    Вывод информации о авторе с его книгами по id
+     */
     @GetMapping("/full_information_author/{id}")
     @ResponseBody
     public AuthorsView findAllAuthorsFullId(@PathVariable Long id) {
         return authorsService.getAuthorFull(id);
     }
 
-    //CREATE
+    /*
+    Добавление автора
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
@@ -69,14 +113,18 @@ public class AuthorsController {
     }
 
 
-    //DELETE
+    /*
+    Удаление автора
+     */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAuthor(@PathVariable Long id){
         authorsService.delete(id);
     }
 
-    //UPDATE
+    /*
+    Обновление записи об авторе
+     */
     @PutMapping("/{id}")
     public AuthorsView updateAuthor(@PathVariable(name = "id") Long id,
                                     @RequestBody @Valid AuthorsBaseReq req){
